@@ -7,7 +7,7 @@ supports_stream = False
 needs_auth = True
 
 def _create_completion(model: str, messages: list, stream: bool, **kwargs):
-    psid = {cookie.name: cookie.value for cookie in browser_cookie3.chrome(
+    psid = {cookie.name: cookie.value for cookie in browser_cookie3.edge(
         domain_name='.google.com')}['__Secure-1PSID']
     
     formatted = '\n'.join([
