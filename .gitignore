@@ -31,3 +31,4 @@ cookie.json
 
 dist/
 json/
+*.ini
