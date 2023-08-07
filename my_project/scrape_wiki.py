@@ -360,7 +360,6 @@ class PW_Wiki_Scrape:
                 continue
             if not filename.endswith(".json"):
                 continue
-            print("Loading f ", filename)
             new_data = {}
             with open(f"json/{filename}", "r") as infile:
                 data = json.load(infile)

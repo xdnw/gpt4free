@@ -5,47 +5,42 @@ import tiktoken
 from openai.openai_object import OpenAIObject
 
 import g4f
-from g4f.Provider import (
-    Ails,
-    You,
-    Bing,
-    Yqcloud,
-    Theb,
-    Aichat,
-    Bard,
-    Vercel,
-    Forefront,
-    Lockchat,
-    Liaobots,
-    H2o,
-    ChatgptLogin,
-    DeepAi,
-    GetGpt
-)
+
+from my_project.Config import config
 
 enc = tiktoken.get_encoding("cl100k_base")
 assert enc.decode(enc.encode("hello world")) == "hello world"
 
-from Config import config
 
 class GPTUtil:
-    # EasyChat
-    # Acytoo
-    # DeepAi
-    # GetGpt
-    # Aichat
-    _GPT3_PROVIDERS = [g4f.Provider.EasyChat, g4f.Provider.Acytoo, g4f.Provider.GetGpt, g4f.Provider.Aichat] # , g4f.Provider.DeepAi
+    _GPT3_PROVIDERS = [g4f.Provider.EasyChat, g4f.Provider.Acytoo, g4f.Provider.GetGpt, g4f.Provider.Aichat,
+                       g4f.Provider.DeepAi]
     _GPT_PROVIDER_INDEX = 0
+    openai.api_key = config.open_ai.api_key
 
     @staticmethod
-    def gpt3Request(prompt: str):
-        GPTUtil._GPT_PROVIDER_INDEX += 1
-        myIndex = GPTUtil._GPT_PROVIDER_INDEX % len(GPTUtil._GPT3_PROVIDERS)
-        pickprovider = GPTUtil._GPT3_PROVIDERS[myIndex]
-
-        return str(
-            g4f.ChatCompletion.create(model=g4f.Model.gpt_35_turbo, messages=[{"role": "user", "content": prompt}],
-                                      provider=pickprovider))
+    def gpt3_5_response(prompt: str, allow_paid: bool = False):
+        for i in range(5):
+            try:
+                GPTUtil._GPT_PROVIDER_INDEX += 1
+                myIndex = GPTUtil._GPT_PROVIDER_INDEX % len(GPTUtil._GPT3_PROVIDERS)
+                pickprovider = GPTUtil._GPT3_PROVIDERS[myIndex]
+                result = g4f.ChatCompletion.create(model=g4f.Model.gpt_35_turbo,
+                                                   messages=[{"role": "user", "content": prompt}],
+                                                   provider=pickprovider)
+                if result is not None and result != "":
+                    return result
+            except Exception as e:
+                print(e)
+                print("GPTUtil.gpt3Request: retrying")
+                continue
+        if allow_paid:
+            print("GPTUtil.gpt3Request: using paid API")
+            completion = openai.ChatCompletion.create(
+                api_key=config.open_ai.api_key,
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}])
+            return completion.choices[0].message.content
 
     @staticmethod
     def getModeration(input):
@@ -57,7 +52,6 @@ class GPTUtil:
     @staticmethod
     def checkModeration(moderation_result: OpenAIObject, text: str):
         # escape all backticks in text
-
 
         # if error in moderation_result
         if "error" in moderation_result:
@@ -74,15 +68,16 @@ class GPTUtil:
                 text = text.replace("```", "\\`\\`\\`")
                 # raise error
                 raise ValueError(f"Your submission has been flagged as inappropriate:\n" +
-                "```json\n" + str(result.category_scores) + "\n```\n" +
-                "The content submitted:\n" +
-                "```json\n" + text + "\n```")
+                                 "```json\n" + str(result.category_scores) + "\n```\n" +
+                                 "The content submitted:\n" +
+                                 "```json\n" + text + "\n```")
 
         return True
 
     @staticmethod
-    def getTokens(input, model_type):
+    def getTokens(input: str, model_type: str, wrap: bool = False):
         # To get the tokeniser corresponding to a specific model in the OpenAI API:
+        to_encode = input
         enc = tiktoken.encoding_for_model(model_type)
         encoded = enc.encode(input)
         # return length

@@ -1,22 +1,22 @@
-websocket-client
-requests
+websocket-client~=1.6.1
+requests~=2.31.0
 tls-client
-pypasser
+pypasser~=0.0.5
 names
 colorama
 curl_cffi
-aiohttp
-flask
+aiohttp~=3.8.4
+flask~=2.3.2
 flask_cors
-streamlit
-selenium
+streamlit~=1.24.1
+selenium~=4.10.0
 fake-useragent
-twocaptcha
+twocaptcha~=0.0.1
 streamlit-chat@https://github.com/AI-Yash/st-chat/archive/refs/pull/24/head.zip
-pydantic
+pydantic~=1.10.11
 pymailtm
-Levenshtein
-retrying
+Levenshtein~=0.21.1
+retrying~=1.3.4
 mailgw_temporary_email
 pycryptodome
 random-password-generator
@@ -24,5 +24,9 @@ numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
 tornado>=6.3.2 # not directly required, pinned by Snyk to avoid a vulnerability
 PyExecJS
 browser_cookie3
-beautifulsoup4
+beautifulsoup4~=4.12.2
 
+
+certifi~=2023.5.7
+openai~=0.27.8
+tiktoken~=0.4.0

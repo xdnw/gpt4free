@@ -4,24 +4,6 @@ import time
 
 from scrape_wiki import PW_Wiki_Scrape
 from GPTUtil import GPTUtil
-import g4f
-from g4f.Provider import (
-    Ails,
-    You,
-    Bing,
-    Yqcloud,
-    Theb,
-    Aichat,
-    Bard,
-    Vercel,
-    Forefront,
-    Lockchat,
-    Liaobots,
-    H2o,
-    ChatgptLogin,
-    DeepAi,
-    GetGpt
-)
 
 # Load the wiki pages
 PW_Wiki_Scrape.saveDefaultPages()
@@ -47,12 +29,12 @@ Do not make anything up.
     # combine page name, categories and main
     page = "### Page Name: " + str(page_name) + "\n### Categories:\n" + str(categories) + "\n### Blurb\n" + str(main)
 
-        # get tokens from prompt
-    max_tokens = 4096
-    prompt_tokens = GPTUtil.getTokens(prompt_summary, "gpt-3.5-turbo")
+    # get tokens from prompt
+    max_tokens = 3072
+    prompt_tokens = GPTUtil.getTokens(prompt_summary, "gpt-3.5-turbo-0613")
     remaining_tokens = max_tokens - prompt_tokens
 
-    # Add summary, main, headings and then as much of the page that will fit in the 4096 tokens
+    # Add summary, main, headings and then as much of the page that will fit in the 3072 tokens
     page_json_copy = page_json.copy()
     page_json_copy.pop('categories', None)
     page_json_copy.pop('main', None)
@@ -63,15 +45,20 @@ Do not make anything up.
 
     page_first = GPTUtil.getFirst(page, "gpt-3.5-turbo", remaining_tokens)
 
+
+
     moderation_result = GPTUtil.getModeration(page_first)
     GPTUtil.checkModeration(moderation_result, page_first)
 
     # replace text in prompt
     prompt = prompt_summary.replace("{text}", page_first)
+     # print tokens
+    print("Prompt tokens: " + str(GPTUtil.getTokens(prompt, "gpt-3.5-turbo")))
 
+    # raise ValueError("Test")
     result = None
     try:
-        return GPTUtil.gpt3Request(prompt)
+        return GPTUtil.gpt3_5_response(prompt, True)
     except Exception as e:
         print(prompt)
         print("Error: " +  repr(e))
@@ -87,7 +74,6 @@ def saveSummary(page_name):
     save_location = "json/summary/" + slug + ".txt"
     # if exists, skip
     if os.path.exists(save_location):
-        print("Skipping " + slug + " as it already exists")
         return
 
     # if exists in json/summary/errors
