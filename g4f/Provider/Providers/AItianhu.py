@@ -6,6 +6,8 @@ url = "https://www.aitianhu.com/api/chat-process"
 model = ['gpt-3.5-turbo']
 supports_stream = False
 needs_auth = False
+working = True
+
 
 def _create_completion(model: str, messages: list, stream: bool, **kwargs):
     base = ''
@@ -20,8 +22,8 @@ def _create_completion(model: str, messages: list, stream: bool, **kwargs):
         "prompt": base,
         "options": {},
         "systemMessage": "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
-        "temperature": 0.8,
-        "top_p": 1
+        "temperature": kwargs.get("temperature", 0.8),
+        "top_p": kwargs.get("top_p", 1)
     }
     response = requests.post(url, headers=headers, json=data)
     if response.status_code == 200:

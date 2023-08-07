@@ -6,11 +6,12 @@ url = 'http://supertest.lockchat.app'
 model = ['gpt-4', 'gpt-3.5-turbo']
 supports_stream = True
 needs_auth = False
+working = False
 
 def _create_completion(model: str, messages: list, stream: bool, temperature: float = 0.7, **kwargs):
 
     payload = {
-        "temperature": 0.7,
+        "temperature": temperature,
         "messages": messages,
         "model": model,
         "stream": True,

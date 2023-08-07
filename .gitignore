@@ -32,3 +32,12 @@ cookie.json
 dist/
 json/
 *.ini
+*.egg-info/
+*.egg
+*.egg-info
+build
+test.py
+
+# Emacs crap
+*~
+
