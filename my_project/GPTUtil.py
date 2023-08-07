@@ -1,3 +1,4 @@
+import random
 import re
 
 import openai
@@ -12,27 +13,48 @@ enc = tiktoken.get_encoding("cl100k_base")
 assert enc.decode(enc.encode("hello world")) == "hello world"
 
 
+# Ails
+# Aichat
+# DeepAi
+# GetGpt
+# AItianhu
+# EasyChat
+# DfeHub
+# AiService
+
 class GPTUtil:
-    _GPT3_PROVIDERS = [g4f.Provider.EasyChat, g4f.Provider.Acytoo, g4f.Provider.GetGpt, g4f.Provider.Aichat,
-                       g4f.Provider.DeepAi]
-    _GPT_PROVIDER_INDEX = 0
+    _GPT3_PROVIDERS = [
+        # g4f.Provider.Ails,
+       g4f.Provider.Aichat, # works
+       # g4f.Provider.DeepAi,
+       g4f.Provider.GetGpt, # works
+       # g4f.Provider.AItianhu,
+       # g4f.Provider.EasyChat,
+       # g4f.Provider.DfeHub,
+       # g4f.Provider.AiService
+       ]
+    # set to random starting index using rand int in range of len(_GPT3_PROVIDERS)
+    _GPT_PROVIDER_INDEX = random.randint(0, len(_GPT3_PROVIDERS) - 1)
+
     openai.api_key = config.open_ai.api_key
 
     @staticmethod
     def gpt3_5_response(prompt: str, allow_paid: bool = False):
-        for i in range(5):
+        maxRange = len(GPTUtil._GPT3_PROVIDERS)
+        for i in range(maxRange):
+            GPTUtil._GPT_PROVIDER_INDEX += 1
+            myIndex = GPTUtil._GPT_PROVIDER_INDEX % len(GPTUtil._GPT3_PROVIDERS)
+            pickprovider = GPTUtil._GPT3_PROVIDERS[myIndex]
+            print("GPTUtil.gpt3Request: trying provider: " + pickprovider.__name__)
             try:
-                GPTUtil._GPT_PROVIDER_INDEX += 1
-                myIndex = GPTUtil._GPT_PROVIDER_INDEX % len(GPTUtil._GPT3_PROVIDERS)
-                pickprovider = GPTUtil._GPT3_PROVIDERS[myIndex]
                 result = g4f.ChatCompletion.create(model=g4f.Model.gpt_35_turbo,
                                                    messages=[{"role": "user", "content": prompt}],
                                                    provider=pickprovider)
                 if result is not None and result != "":
+                    print("Succeeded for provider: " + pickprovider.__name__)
                     return result
             except Exception as e:
-                print(e)
-                print("GPTUtil.gpt3Request: retrying")
+                print("GPTUtil.gpt3Request: retrying. Failed for " + pickprovider.__name__ + ": " + str(e))
                 continue
         if allow_paid:
             print("GPTUtil.gpt3Request: using paid API")

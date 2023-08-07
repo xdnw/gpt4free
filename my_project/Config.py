@@ -10,5 +10,5 @@ class ParentConfig(Config):
     open_ai = group_key(OpenAIConfig)
 
 config = ParentConfig()
-config.add_source(IniFileConfigSource("config/config.ini"))
+config.add_source(IniFileConfigSource("my_project/config/config.ini"))
 config.read()
